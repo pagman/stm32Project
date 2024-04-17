@@ -97,7 +97,7 @@ int main(void)
   {
       /* USER CODE END WHILE */
 	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-   	  HAL_Delay(1000);
+   	  HAL_Delay(50);
    	  count++;
    	  if(count >= 5){
    		  hello[10]='B';
