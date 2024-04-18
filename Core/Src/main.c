@@ -69,25 +69,32 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
   uint8_t rx_data[strlen(expected_response)];
   uint16_t rx_len = 0;
   HAL_StatusTypeDef status;
+  uint32_t start_tick = HAL_GetTick();
 
   // Copy AT command to transmit buffer (including null terminator)
   strcpy((char*)tx_data, at_command);
 
   // Send AT command
-  status = HAL_UART_Transmit(&huart1, tx_data, strlen((char*)tx_data), 100);
+  status = HAL_UART_Transmit(&huart1, tx_data, strlen((char*)tx_data), 1000);
   if (status != HAL_OK) {
     return -1; // Error during transmission
   }
 
   // Start receiving response with timeout
-  HAL_UART_Receive(&huart1, rx_data, strlen(expected_response), 10);
+  HAL_UART_Receive(&huart1, rx_data, strlen(expected_response), 1000);
 
   // Check if received data matches expected response
-  while (rx_len < strlen(expected_response) && HAL_UART_GetState(&huart1) != HAL_UART_STATE_TIMEOUT) {
+  /*while (rx_len < strlen(expected_response) && (HAL_GetTick() - start_tick) < 10000) { //wait 10s
     if (HAL_UART_Receive(&huart1, rx_data + rx_len, 1, 10) == HAL_OK) {
       rx_len++;
     }
-  }
+  }*/
+
+  while (rx_len < strlen(expected_response) && HAL_UART_GetState(&huart1) != HAL_UART_STATE_TIMEOUT) { //wait until timeout
+      if (HAL_UART_Receive(&huart1, rx_data + rx_len, 1, 10) == HAL_OK) {
+        rx_len++;
+      }
+    }
 
   if (rx_len != strlen(expected_response) || strncmp((char*)rx_data, expected_response, rx_len) != 0) {
     return -2; // Response timeout or mismatch
@@ -144,7 +151,7 @@ int main(void)
 	  count++;
 	  check = send_at_command_and_check_response("AT\r\n", "OK\r\n");
 	  //HAL_UART_Transmit(&huart1,(uint8_t*)buffer,strlen((const char*)buffer),10);
-	  //HAL_Delay(1000);
+	  HAL_Delay(1000);
 	  //HAL_UART_Receive_IT(&huart1, buffer, 10);
 
 
