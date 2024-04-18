@@ -97,17 +97,23 @@ int main(void)
   int count = 0;
   char hello[] = "hello world";
   char buffer [10] = "hello\r\n";
-  char numarray[20];
+  uint8_t numarray[10];
   static char msg[16];
+  uint8_t Rx_data[10];
+  sprintf(buffer,"Hello %d\r\n",count);//  creating a buffer of 10 bytes
   while (1)
   {
     /* USER CODE END WHILE */
-	  sprintf(numarray, "counter is:\r\n");
-	  HAL_UART_Transmit_IT(&huart1, (uint8_t *)msg, sprintf(msg, "speed \n"));
 	  count++;
+
+	  HAL_UART_Transmit(&huart1,(uint8_t*)buffer,strlen((const char*)buffer),10);
 	  HAL_Delay(1000);
-      /* USER CODE BEGIN 3 */
+	  HAL_UART_Receive_IT(&huart1, buffer, 10);
+
+
+    /* USER CODE BEGIN 3 */
       }
+
   /* USER CODE END 3 */
 }
 
