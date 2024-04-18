@@ -63,6 +63,42 @@ static void MX_USART1_UART_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
+
+int send_at_command_and_check_response(const char* at_command, const char* expected_response) {
+  uint8_t tx_data[strlen(at_command) + 1]; // Add space for null terminator
+  uint8_t rx_data[strlen(expected_response)];
+  uint16_t rx_len = 0;
+  HAL_StatusTypeDef status;
+
+  // Copy AT command to transmit buffer (including null terminator)
+  strcpy((char*)tx_data, at_command);
+
+  // Send AT command
+  status = HAL_UART_Transmit(&huart1, tx_data, strlen((char*)tx_data), 100);
+  if (status != HAL_OK) {
+    return -1; // Error during transmission
+  }
+
+  // Start receiving response with timeout
+  HAL_UART_Receive(&huart1, rx_data, strlen(expected_response), 10);
+
+  // Check if received data matches expected response
+  while (rx_len < strlen(expected_response) && HAL_UART_GetState(&huart1) != HAL_UART_STATE_TIMEOUT) {
+    if (HAL_UART_Receive(&huart1, rx_data + rx_len, 1, 10) == HAL_OK) {
+      rx_len++;
+    }
+  }
+
+  if (rx_len != strlen(expected_response) || strncmp((char*)rx_data, expected_response, rx_len) != 0) {
+    return -2; // Response timeout or mismatch
+  }
+
+  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+  HAL_Delay(1000);
+  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+  return 0; // Success
+}
+
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -100,15 +136,16 @@ int main(void)
   uint8_t numarray[10];
   static char msg[16];
   uint8_t Rx_data[10];
+  int check;
   sprintf(buffer,"Hello %d\r\n",count);//  creating a buffer of 10 bytes
   while (1)
   {
     /* USER CODE END WHILE */
 	  count++;
-
-	  HAL_UART_Transmit(&huart1,(uint8_t*)buffer,strlen((const char*)buffer),10);
-	  HAL_Delay(1000);
-	  HAL_UART_Receive_IT(&huart1, buffer, 10);
+	  check = send_at_command_and_check_response("AT\r\n", "OK\r\n");
+	  //HAL_UART_Transmit(&huart1,(uint8_t*)buffer,strlen((const char*)buffer),10);
+	  //HAL_Delay(1000);
+	  //HAL_UART_Receive_IT(&huart1, buffer, 10);
 
 
     /* USER CODE BEGIN 3 */
