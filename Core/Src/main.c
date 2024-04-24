@@ -19,7 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include <string.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -84,7 +84,7 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
 //  }
 
 
-  if (rx_len != strlen(expected_response) || strncmp((char*)rx_data, expected_response, rx_len) != 0) {
+  if (strncmp((char*)rx_data, expected_response, strlen(expected_response)) != 0) {
     return -2; // Response timeout or mismatch
   }
 
@@ -146,7 +146,8 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	  count++;
 	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
-	  //check = send_at_command_and_check_response("AT+CPIN?\r\n", "AT+CPIN?\r\r\n+CPIN: READY\r\n\r\nOK\r\n");
+	  check = send_at_command_and_check_response("AT+CFUN=1\r\n", "AT+CFUN=1\r\r\nOK\r\n");
+	  check = send_at_command_and_check_response("AT+CPIN?\r\n", "AT+CPIN?\r\r\n+CPIN: READY\r\n\r\nOK\r\n");
 	  //HAL_UART_Transmit(&huart1,(uint8_t*)buffer,strlen((const char*)buffer),10);
 	  HAL_Delay(1000);
 	  //HAL_UART_Receive_IT(&huart1, buffer, 10);
