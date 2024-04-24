@@ -56,17 +56,9 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
-
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
-
 int send_at_command_and_check_response(const char* at_command, const char* expected_response) {
   uint8_t tx_data[strlen(at_command) + 1]; // Add space for null terminator
-  uint8_t rx_data[strlen(expected_response)];
+  uint8_t rx_data[strlen(expected_response)+1];
   uint16_t rx_len = 0;
   HAL_StatusTypeDef status;
   uint32_t start_tick = HAL_GetTick();
@@ -75,26 +67,22 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
   strcpy((char*)tx_data, at_command);
 
   // Send AT command
-  status = HAL_UART_Transmit(&huart1, tx_data, strlen((char*)tx_data), 1000);
+  status = HAL_UART_Transmit_IT(&huart1, tx_data, strlen((char*)tx_data));
   if (status != HAL_OK) {
     return -1; // Error during transmission
   }
 
   // Start receiving response with timeout
-  HAL_UART_Receive(&huart1, rx_data, strlen(expected_response), 1000);
+  HAL_UART_Receive_IT(&huart1, rx_data, strlen(expected_response)+1);
+
 
   // Check if received data matches expected response
-  /*while (rx_len < strlen(expected_response) && (HAL_GetTick() - start_tick) < 10000) { //wait 10s
-    if (HAL_UART_Receive(&huart1, rx_data + rx_len, 1, 10) == HAL_OK) {
+  while (rx_len < strlen(expected_response) && HAL_UART_GetState(&huart1) != HAL_UART_STATE_TIMEOUT) {
+    if (HAL_UART_Receive_IT(&huart1, rx_data + rx_len, 1) == HAL_OK) {
       rx_len++;
     }
-  }*/
+  }
 
-  while (rx_len < strlen(expected_response) && HAL_UART_GetState(&huart1) != HAL_UART_STATE_TIMEOUT) { //wait until timeout
-      if (HAL_UART_Receive(&huart1, rx_data + rx_len, 1, 10) == HAL_OK) {
-        rx_len++;
-      }
-    }
 
   if (rx_len != strlen(expected_response) || strncmp((char*)rx_data, expected_response, rx_len) != 0) {
     return -2; // Response timeout or mismatch
@@ -106,6 +94,12 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
   return 0; // Success
 }
 
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -148,14 +142,13 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
 	  count++;
 	  check = send_at_command_and_check_response("AT\r\n", "OK\r\n");
 	  //HAL_UART_Transmit(&huart1,(uint8_t*)buffer,strlen((const char*)buffer),10);
 	  HAL_Delay(1000);
 	  //HAL_UART_Receive_IT(&huart1, buffer, 10);
-
-
-    /* USER CODE BEGIN 3 */
       }
 
   /* USER CODE END 3 */
@@ -218,7 +211,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 9600;
+  huart1.Init.BaudRate = 115200;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
