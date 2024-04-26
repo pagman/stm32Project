@@ -148,6 +148,8 @@ int main(void)
 	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
 	  check = send_at_command_and_check_response("AT+CFUN=1\r\n", "AT+CFUN=1\r\r\nOK\r\n");
 	  check = send_at_command_and_check_response("AT+CPIN?\r\n", "AT+CPIN?\r\r\n+CPIN: READY\r\n\r\nOK\r\n");
+	  //check = send_at_command_and_check_response("AT+CPIN?\r\n", "AT+CPIN?\r\r\n+CPIN: READY\r\n\r\nOK\r\n");
+	  check = send_at_command_and_check_response("AT+CSQ\r\n", "AT+CSQ\r\r\n+CSQ: 21,0\r\n\r\nOK\r\n");
 	  //HAL_UART_Transmit(&huart1,(uint8_t*)buffer,strlen((const char*)buffer),10);
 	  HAL_Delay(1000);
 	  //HAL_UART_Receive_IT(&huart1, buffer, 10);
