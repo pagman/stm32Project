@@ -58,22 +58,22 @@ static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN 0 */
 int send_at_command_and_check_response(const char* at_command, const char* expected_response) {
   uint8_t tx_data[strlen(at_command)+1]; // Add space for null terminator
-  uint8_t rx_data[strlen(expected_response)];
-  uint16_t rx_len = 0;
+  uint8_t rx_data[strlen(expected_response)+20];
   HAL_StatusTypeDef status;
-  uint32_t start_tick = HAL_GetTick();
 
   // Copy AT command to transmit buffer (including null terminator)
   strcpy((char*)tx_data, at_command);
 
   // Send AT command
-  status = HAL_UART_Transmit_IT(&huart1, tx_data, strlen((char*)tx_data));
+  status = HAL_UART_Transmit(&huart1, tx_data, strlen((char*)tx_data),1000);
   if (status != HAL_OK) {
     return -1; // Error during transmission
   }
 
   // Start receiving response with timeout
   HAL_UART_Receive(&huart1, rx_data, strlen(expected_response),1000);
+  //HAL_UART_Receive_IT(&huart1, rx_data, strlen(expected_response));
+
 
 
   // Check if received data matches expected response
@@ -84,6 +84,9 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
 //  }
 
 
+//  if ( strcmp(response+strlen(response)-4, expected_response+strlen(expected_response)-4) != 0 ) {
+//      return -2; // Response timeout or mismatch
+//    }
   if (strncmp((char*)rx_data, expected_response, strlen(expected_response)) != 0) {
     return -2; // Response timeout or mismatch
   }
@@ -146,16 +149,27 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	  count++;
 	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
-	  check = send_at_command_and_check_response("AT+CFUN=1\r\n", "AT+CFUN=1\r\r\nOK\r\n");
+	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
+	  //check = send_at_command_and_check_response("AT+CFUN=1\r\n", "AT+CFUN=1\r\r\nOK\r\n");
 	  check = send_at_command_and_check_response("AT+CPIN?\r\n", "AT+CPIN?\r\r\n+CPIN: READY\r\n\r\nOK\r\n");
 	  check = send_at_command_and_check_response("AT+CSQ\r\n", "AT+CSQ\r\r\n+CSQ: 21,0\r\n\r\nOK\r\n");
+//	  for (int i=0; i<=2;i++){
+//		  HAL_Delay(1000);
+//		  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
+//		  check = send_at_command_and_check_response("AT+CSQ\r\n", "AT+CSQ\r\r\n+CSQ: 21,0\r\n\r\nOK\r\n");
+//
+//
+//	  }
 	  check = send_at_command_and_check_response("AT+CREG?\r\n", "AT+CREG?\r\r\n+CREG: 0,5\r\n\r\nOK\r\n");
 	  check = send_at_command_and_check_response("AT+CGATT?\r\n", "AT+CGATT?\r\r\n+CGATT: 1\r\n\r\nOK\r\n");
-	  check = send_at_command_and_check_response("AT+CSTT=\"TM\",\"\",\"\"\r\n", "AT+CSTT=\"TM\",\"\",\"\"\r\r\nOK\r\n");
-	  HAL_Delay(500);
+	  /*
+	   * run AT+CSTT only if AT+CGAT =0
+	   */
+	  //check = send_at_command_and_check_response("AT+CSTT=\"TM\",\"\",\"\"\r\n", "AT+CSTT=\"TM\",\"\",\"\"\r\r\nOK\r\n");
 	  check = send_at_command_and_check_response("AT+CIICR\r\n", "AT+CIICR\r\r\nOK\r\n");
 	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "AT+CIFSR\r\r\n10.5.126.144\r\n");
-	  check = send_at_command_and_check_response("AT+CFUN=0\r\n", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT+CFUN=0\r\r\nOK\r\n");
+
+	  //check = send_at_command_and_check_response("AT+CFUN=0\r\n", "AT+CFUN=0\r\r\nOK\r\n");
 	  //HAL_UART_Transmit(&huart1,(uint8_t*)buffer,strlen((const char*)buffer),10);
 	  HAL_Delay(1000);
 	  //HAL_UART_Receive_IT(&huart1, buffer, 10);
