@@ -88,8 +88,14 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
 //      return -2; // Response timeout or mismatch
 //    }
   if (strncmp((char*)rx_data, expected_response, strlen(expected_response)) != 0) {
-    return -2; // Response timeout or mismatch
+    return -2; // retun invalid reponse
   }
+
+//  if (strstr((char*)rx_data, "OK\r\n") != 0) { // search inside substring
+//      return -3;
+//    }
+
+
 
   HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
   HAL_Delay(1000);
@@ -149,30 +155,21 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	  count++;
 	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
-	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
-	  //check = send_at_command_and_check_response("AT+CFUN=1\r\n", "AT+CFUN=1\r\r\nOK\r\n");
 	  check = send_at_command_and_check_response("AT+CPIN?\r\n", "AT+CPIN?\r\r\n+CPIN: READY\r\n\r\nOK\r\n");
 	  check = send_at_command_and_check_response("AT+CSQ\r\n", "AT+CSQ\r\r\n+CSQ: 21,0\r\n\r\nOK\r\n");
-//	  for (int i=0; i<=2;i++){
-//		  HAL_Delay(1000);
-//		  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
-//		  check = send_at_command_and_check_response("AT+CSQ\r\n", "AT+CSQ\r\r\n+CSQ: 21,0\r\n\r\nOK\r\n");
-//
-//
-//	  }
 	  check = send_at_command_and_check_response("AT+CREG?\r\n", "AT+CREG?\r\r\n+CREG: 0,5\r\n\r\nOK\r\n");
 	  check = send_at_command_and_check_response("AT+CGATT?\r\n", "AT+CGATT?\r\r\n+CGATT: 1\r\n\r\nOK\r\n");
+	  //check = send_at_command_and_check_response("AT+CGATT=1\r\n", "AT+CGATT=1\r\r\n+CGATT: 1\r\n\r\nOK\r\n");
 	  /*
-	   * run AT+CSTT only if AT+CGAT =0
+	   * check if there is no IP then send APN  and register request
 	   */
-	  //check = send_at_command_and_check_response("AT+CSTT=\"TM\",\"\",\"\"\r\n", "AT+CSTT=\"TM\",\"\",\"\"\r\r\nOK\r\n");
-	  check = send_at_command_and_check_response("AT+CIICR\r\n", "AT+CIICR\r\r\nOK\r\n");
+	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "AT+CIFSR\r\r\nERROR\r\n");
+	  if(check ==0){
+		  check = send_at_command_and_check_response("AT+CSTT=\"TM\"\r\n", "AT+CSTT=\"TM\"\r\r\nOK\r\n");
+		  check = send_at_command_and_check_response("AT+CIICR\r\n", "AT+CIICR\r\r\nOK\r\n");
+	  }
 	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "AT+CIFSR\r\r\n10.5.126.144\r\n");
-
-	  //check = send_at_command_and_check_response("AT+CFUN=0\r\n", "AT+CFUN=0\r\r\nOK\r\n");
-	  //HAL_UART_Transmit(&huart1,(uint8_t*)buffer,strlen((const char*)buffer),10);
 	  HAL_Delay(1000);
-	  //HAL_UART_Receive_IT(&huart1, buffer, 10);
       }
 
   /* USER CODE END 3 */
