@@ -178,6 +178,10 @@ int main(void)
 	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "ERROR");
 	  if(check!=0){
 		  //means doesn't have error in the response so it can proceed with the connection
+		  check = send_at_command_and_check_response("AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\n", "AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\r\nOK\r\n");
+		  check = send_at_command_and_check_response("AT+CIPSEND=4\r\n", "AT+CIPSEND=4\r\r\n>");
+		  check = send_at_command_and_check_response("test\r\n", "test\r\r\nSEND");
+
 	  }
 
 //	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
