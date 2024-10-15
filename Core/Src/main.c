@@ -19,7 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <string.h>
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -157,32 +157,36 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  count++;
-	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
-	  if(check!=0){ //doesnt even reply to the most basic command so do system rsr
-		  NVIC_SystemReset();
-	  }
-	  check = send_at_command_and_check_response("AT+CPIN?\r\n", "READY");
-	  check = send_at_command_and_check_response("AT+CSQ\r\n", "OK\r\n");
-	  check = send_at_command_and_check_response("AT+CREG?\r\n", "OK\r\n");
-	  check = send_at_command_and_check_response("AT+CGATT?\r\n", "OK\r\n");
-	  //check = send_at_command_and_check_response("AT+CGATT=1\r\n", "AT+CGATT=1\r\r\n+CGATT: 1\r\n\r\nOK\r\n");
-	  /*
-	   * check if there is no IP then send APN  and register request
-	   */
-	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "ERROR");
-	  if(check ==0){ //means it find error in CIFSR so needs to set APN and CIICR
-	   check = send_at_command_and_check_response("AT+CSTT=\"TM\"\r\n", "OK\r\n");
-	   check = send_at_command_and_check_response("AT+CIICR\r\n", "OK\r\n");
-	  }
-	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "ERROR");
-	  if(check!=0){
-		  //means doesn't have error in the response so it can proceed with the connection
-		  check = send_at_command_and_check_response("AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\n", "AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\r\nOK\r\n");
-		  check = send_at_command_and_check_response("AT+CIPSEND=4\r\n", "AT+CIPSEND=4\r\r\n>");
-		  check = send_at_command_and_check_response("test\r\n", "test\r\r\nSEND");
 
-	  }
+	  //debug start new module
+//	  count++;
+//	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
+//	  if(check!=0){ //doesnt even reply to the most basic command so do system rsr
+//		  NVIC_SystemReset();
+//	  }
+//	  check = send_at_command_and_check_response("AT+CPIN?\r\n", "READY");
+//	  check = send_at_command_and_check_response("AT+CSQ\r\n", "OK\r\n");
+//	  check = send_at_command_and_check_response("AT+CREG?\r\n", "OK\r\n");
+//	  check = send_at_command_and_check_response("AT+CGATT?\r\n", "OK\r\n");
+//	  //check = send_at_command_and_check_response("AT+CGATT=1\r\n", "AT+CGATT=1\r\r\n+CGATT: 1\r\n\r\nOK\r\n");
+//	  /*
+//	   * check if there is no IP then send APN  and register request
+//	   */
+//	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "ERROR");
+//	  if(check ==0){ //means it find error in CIFSR so needs to set APN and CIICR
+//	   check = send_at_command_and_check_response("AT+CSTT=\"TM\"\r\n", "OK\r\n");
+//	   check = send_at_command_and_check_response("AT+CIICR\r\n", "OK\r\n");
+//	  }
+//	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "ERROR");
+//	  if(check!=0){
+//		  //means doesn't have error in the response so it can proceed with the connection
+//		  check = send_at_command_and_check_response("AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\n", "AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\r\nOK\r\n");
+//		  check = send_at_command_and_check_response("AT+CIPSEND=4\r\n", "AT+CIPSEND=4\r\r\n>");
+//		  check = send_at_command_and_check_response("test\r\n", "test\r\r\nSEND");
+//
+//	  }
+
+	  //debug end new module
 
 //	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
 //	  check = send_at_command_and_check_response("AT+CPIN?\r\n", "AT+CPIN?\r\r\n+CPIN: READY\r\n\r\nOK\r\n");
@@ -199,7 +203,10 @@ int main(void)
 //		  check = send_at_command_and_check_response("AT+CIICR\r\n", "AT+CIICR\r\r\nOK\r\n");
 //	  }
 //	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "AT+CIFSR\r\r\n10.5.126.144\r\n");
-	  HAL_Delay(1000);
+	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+	  HAL_Delay(100);
+	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+	  HAL_Delay(500);
       }
 
   /* USER CODE END 3 */
@@ -292,9 +299,20 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : LED2_Pin */
+  GPIO_InitStruct.Pin = LED2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED2_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LED_Pin */
   GPIO_InitStruct.Pin = LED_Pin;
