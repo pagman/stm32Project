@@ -73,33 +73,11 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
 
   // Start receiving response with timeout
   HAL_UART_Receive(&huart1, rx_data, strlen(expected_response)+30,1000);
-  //HAL_UART_Receive_IT(&huart1, rx_data, strlen(expected_response));
 
-
-
-  // Check if received data matches expected response
-//  while (rx_len < strlen(expected_response) && HAL_UART_GetState(&huart1) != HAL_UART_STATE_TIMEOUT) {
-//    if (HAL_UART_Receive(&huart1, rx_data + rx_len, 1,10) == HAL_OK) {
-//      rx_len++;
-//    }
-//  }
-
-
-//  if ( strcmp(response+strlen(response)-4, expected_response+strlen(expected_response)-4) != 0 ) {
-//      return -2; // Response timeout or mismatch
-//    }
-//  if (strncmp((char*)rx_data, expected_response, strlen(expected_response)) != 0) {
-//    return -2; // retun invalid reponse
-//  }
   ret = strstr((char*)rx_data, expected_response);
   if(ret=='\0'){
          return -2;
      }
-//  if (strstr((char*)rx_data, "OK\r\n") != 0) { // search inside substring
-//      return -3;
-//    }
-
-
 
   HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
   HAL_Delay(1000);
@@ -152,39 +130,44 @@ int main(void)
   uint8_t Rx_data[10];
   int check;
   sprintf(buffer,"Hello %d\r\n",count);//  creating a buffer of 10 bytes
+  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
+  HAL_Delay(2000);
+  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
   while (1)
   {
     /* USER CODE END WHILE */
+
 
     /* USER CODE BEGIN 3 */
 
 	  //debug start new module
 //	  count++;
-//	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
-//	  if(check!=0){ //doesnt even reply to the most basic command so do system rsr
-//		  NVIC_SystemReset();
-//	  }
-//	  check = send_at_command_and_check_response("AT+CPIN?\r\n", "READY");
-//	  check = send_at_command_and_check_response("AT+CSQ\r\n", "OK\r\n");
-//	  check = send_at_command_and_check_response("AT+CREG?\r\n", "OK\r\n");
-//	  check = send_at_command_and_check_response("AT+CGATT?\r\n", "OK\r\n");
-//	  //check = send_at_command_and_check_response("AT+CGATT=1\r\n", "AT+CGATT=1\r\r\n+CGATT: 1\r\n\r\nOK\r\n");
+	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
+	  if(check!=0){ //doesnt even reply to the most basic command so do system rst
+		  NVIC_SystemReset();
+
+	  }
+	  check = send_at_command_and_check_response("AT+CPIN?\r\n", "READY");
+	  check = send_at_command_and_check_response("AT+CSQ\r\n", "OK\r\n");
+	  check = send_at_command_and_check_response("AT+CREG?\r\n", "OK\r\n");
+	  check = send_at_command_and_check_response("AT+CGATT?\r\n", "OK\r\n");
+	  check = send_at_command_and_check_response("AT+CGATT=1\r\n", "AT+CGATT=1\r\r\n+CGATT: 1\r\n\r\nOK\r\n");
 //	  /*
 //	   * check if there is no IP then send APN  and register request
 //	   */
-//	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "ERROR");
-//	  if(check ==0){ //means it find error in CIFSR so needs to set APN and CIICR
-//	   check = send_at_command_and_check_response("AT+CSTT=\"TM\"\r\n", "OK\r\n");
-//	   check = send_at_command_and_check_response("AT+CIICR\r\n", "OK\r\n");
-//	  }
-//	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "ERROR");
-//	  if(check!=0){
-//		  //means doesn't have error in the response so it can proceed with the connection
-//		  check = send_at_command_and_check_response("AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\n", "AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\r\nOK\r\n");
-//		  check = send_at_command_and_check_response("AT+CIPSEND=4\r\n", "AT+CIPSEND=4\r\r\n>");
-//		  check = send_at_command_and_check_response("test\r\n", "test\r\r\nSEND");
-//
-//	  }
+	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "ERROR");
+	  if(check ==0){ //means it find error in CIFSR so needs to set APN and CIICR
+	   check = send_at_command_and_check_response("AT+CSTT=\"TM\"\r\n", "OK\r\n");
+	   check = send_at_command_and_check_response("AT+CIICR\r\n", "OK\r\n");
+	  }
+	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "ERROR");
+	  if(check!=0){
+		  //means doesn't have error in the response so it can proceed with the connection
+		  check = send_at_command_and_check_response("AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\n", "AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\r\nOK\r\n");
+		  check = send_at_command_and_check_response("AT+CIPSEND=4\r\n", "AT+CIPSEND=4\r\r\n>");
+		  check = send_at_command_and_check_response("test\r\n", "test\r\r\nSEND");
+
+	  }
 
 	  //debug end new module
 
@@ -203,10 +186,8 @@ int main(void)
 //		  check = send_at_command_and_check_response("AT+CIICR\r\n", "AT+CIICR\r\r\nOK\r\n");
 //	  }
 //	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "AT+CIFSR\r\r\n10.5.126.144\r\n");
-	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-	  HAL_Delay(100);
-	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-	  HAL_Delay(500);
+
+//	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
       }
 
   /* USER CODE END 3 */
