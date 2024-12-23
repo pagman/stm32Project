@@ -1,6 +1,7 @@
 main.c:59:5:send_at_command_and_check_response	120	dynamic
-main.c:101:5:main	280	static
-main.c:231:6:SystemClock_Config	96	static
-main.c:273:13:MX_USART1_UART_Init	8	static
-main.c:308:13:MX_GPIO_Init	48	static
-main.c:346:6:Error_Handler	8	static,ignoring_inline_asm
+main.c:96:6:replace_zeros_with_A	24	static
+main.c:110:5:main	280	static
+main.c:228:6:SystemClock_Config	96	static
+main.c:270:13:MX_USART1_UART_Init	8	static
+main.c:305:13:MX_GPIO_Init	48	static
+main.c:343:6:Error_Handler	8	static,ignoring_inline_asm

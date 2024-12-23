@@ -75,7 +75,7 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
   memset(rx_data, 0, sizeof(rx_data));
   memset(received_data, 0, sizeof(received_data));
   // Start receiving response with timeout
-  HAL_UART_Receive(&huart1, rx_data, strlen(expected_response)+30,1000);
+  HAL_UART_Receive(&huart1, rx_data, strlen(expected_response)+30,2000);
 
   // Copy received data to output buffer
    strncpy(received_data, (char*)rx_data, 100); // Ensure null-termination
@@ -83,6 +83,7 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
 
   ret = strstr((char*)rx_data, expected_response);
   if(ret=='\0'){
+	     HAL_Delay(500);
          return -2;
      }
 
@@ -90,6 +91,14 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
   HAL_Delay(1000);
   HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
   return 0; // Success
+}
+
+void replace_zeros_with_A(char *buffer, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        if (buffer[i] == 0) {
+            buffer[i] = 'A';
+        }
+    }
 }
 
 /* USER CODE END 0 */
@@ -142,8 +151,19 @@ int main(void)
   HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
   HAL_Delay(2000);
   HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n", rx_buffer);
+  check = send_at_command_and_check_response("AT+CPIN?\r\n", "READY", rx_buffer);
+  check = send_at_command_and_check_response("AT+CGNSPWR?\r\n", "OK\r\n", rx_buffer);
+  check = send_at_command_and_check_response("AT+CGNSPWR=1\r\n", "OK\r\n", rx_buffer);
+  check = send_at_command_and_check_response("AT+CGNSIPR=115200\r\n", "OK\r\n", rx_buffer);
+  check = send_at_command_and_check_response("AT+CGNSSEQ=\"RMC\"\r\n", "OK\r\n", rx_buffer);
   while (1)
   {
+//	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n", rx_buffer);
+	  memset(gp_buffer, 0, sizeof(gp_buffer));
+	  check = send_at_command_and_check_response("AT+CGNSINF\r\n", "OK\r\n", rx_buffer);
+	  strcpy(gp_buffer, rx_buffer);
+	  replace_zeros_with_A(gp_buffer, sizeof(gp_buffer));
     /* USER CODE END WHILE */
 
 
@@ -151,17 +171,14 @@ int main(void)
 
 	  //debug start new module
 //	  count++;
-	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n", rx_buffer);
-	  check = send_at_command_and_check_response("AT+CGNSPWR=1\r\n", "OK\r\n", rx_buffer);
-	  check = send_at_command_and_check_response("AT+CGNSIPR=9600\r\n", "OK\r\n", rx_buffer);
-	  check = send_at_command_and_check_response("AT+CGNSSEQ=\"RMC\"\r\n", "OK\r\n", rx_buffer);
+
 
 
 //	  if(check!=0){ //doesnt even reply to the most basic command so do system rst
 //		  NVIC_SystemReset();
 //
 //	  }
-	  check = send_at_command_and_check_response("AT+CPIN?\r\n", "READY", rx_buffer);
+//	  check = send_at_command_and_check_response("AT+CPIN?\r\n", "READY", rx_buffer);
 	  check = send_at_command_and_check_response("AT+CSQ\r\n", "OK\r\n", rx_buffer);
 	  check = send_at_command_and_check_response("AT+CREG?\r\n", "OK\r\n", rx_buffer);
 	  check = send_at_command_and_check_response("AT+CGATT?\r\n", "OK\r\n", rx_buffer);
@@ -176,14 +193,13 @@ int main(void)
 	  }
 	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "ERROR", rx_buffer);
 	  check = send_at_command_and_check_response("AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\n", "AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\r\nOK\r\n", rx_buffer);
-	  check = send_at_command_and_check_response("AT+CIPSEND=100\r\n", "AT+CIPSEND=100\r\r\n>", rx_buffer);
+	  check = send_at_command_and_check_response("AT+CIPSEND=70\r\n", "AT+CIPSEND=70\r\r\n>", rx_buffer);
 	  check = send_at_command_and_check_response(gp_buffer, "test\r\r\nSEND", rx_buffer);
+	  HAL_Delay(2000);
 
-	  for(int i=0;i<=50;i++){
-		  check = send_at_command_and_check_response("AT+CGNSINF\r\n", "OK\r\n", rx_buffer);
-		  memset(gp_buffer, 0, sizeof(gp_buffer));
-		  strcpy(gp_buffer, rx_buffer);
-	  }
+//	  for(int i=0;i<=10;i++){
+
+//	  }
 
 
 	  if(check!=0){
@@ -196,29 +212,10 @@ int main(void)
 	   * GPS
 	   */
 
-//	  check = send_at_command_and_check_response("AT+CGNSINF\r\n", "OK\r\n");
 
 
-
-	  //debug end new module
-
-//	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n");
-//	  check = send_at_command_and_check_response("AT+CPIN?\r\n", "AT+CPIN?\r\r\n+CPIN: READY\r\n\r\nOK\r\n");
-//	  check = send_at_command_and_check_response("AT+CSQ\r\n", "AT+CSQ\r\r\n+CSQ: 21,0\r\n\r\nOK\r\n");
-//	  check = send_at_command_and_check_response("AT+CREG?\r\n", "AT+CREG?\r\r\n+CREG: 0,5\r\n\r\nOK\r\n");
-//	  check = send_at_command_and_check_response("AT+CGATT?\r\n", "AT+CGATT?\r\r\n+CGATT: 1\r\n\r\nOK\r\n");
-//	  //check = send_at_command_and_check_response("AT+CGATT=1\r\n", "AT+CGATT=1\r\r\n+CGATT: 1\r\n\r\nOK\r\n");
-//	  /*
-//	   * check if there is no IP then send APN  and register request
-//	   */
-//	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "AT+CIFSR\r\r\nERROR\r\n");
-//	  if(check ==0){
-//		  check = send_at_command_and_check_response("AT+CSTT=\"TM\"\r\n", "AT+CSTT=\"TM\"\r\r\nOK\r\n");
-//		  check = send_at_command_and_check_response("AT+CIICR\r\n", "AT+CIICR\r\r\nOK\r\n");
-//	  }
-//	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "AT+CIFSR\r\r\n10.5.126.144\r\n");
-
-//	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+//	  HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+//	  HAL_Delay(2000);
       }
 
   /* USER CODE END 3 */
