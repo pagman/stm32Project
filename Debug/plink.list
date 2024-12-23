@@ -668,7 +668,7 @@ int main(void)
  80004f2:	0003      	movs	r3, r0
  80004f4:	197a      	adds	r2, r7, r5
  80004f6:	6013      	str	r3, [r2, #0]
-  check = send_at_command_and_check_response("AT+CGNSIPR=115200\r\n", "OK\r\n", rx_buffer);
+  check = send_at_command_and_check_response("AT+CGNSIPR=9600\r\n", "OK\r\n", rx_buffer);
  80004f8:	193a      	adds	r2, r7, r4
  80004fa:	4955      	ldr	r1, [pc, #340]	; (8000650 <main+0x210>)
  80004fc:	4b57      	ldr	r3, [pc, #348]	; (800065c <main+0x21c>)
@@ -814,7 +814,7 @@ int main(void)
  80005fc:	0003      	movs	r3, r0
  80005fe:	197a      	adds	r2, r7, r5
  8000600:	6013      	str	r3, [r2, #0]
-	  check = send_at_command_and_check_response("AT+CIPSEND=70\r\n", "AT+CIPSEND=70\r\r\n>", rx_buffer);
+	  check = send_at_command_and_check_response("AT+CIPSEND=98\r\n", "AT+CIPSEND=98\r\r\n>", rx_buffer);
  8000602:	193a      	adds	r2, r7, r4
  8000604:	4923      	ldr	r1, [pc, #140]	; (8000694 <main+0x254>)
  8000606:	4b24      	ldr	r3, [pc, #144]	; (8000698 <main+0x258>)

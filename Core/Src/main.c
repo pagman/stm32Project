@@ -155,7 +155,7 @@ int main(void)
   check = send_at_command_and_check_response("AT+CPIN?\r\n", "READY", rx_buffer);
   check = send_at_command_and_check_response("AT+CGNSPWR?\r\n", "OK\r\n", rx_buffer);
   check = send_at_command_and_check_response("AT+CGNSPWR=1\r\n", "OK\r\n", rx_buffer);
-  check = send_at_command_and_check_response("AT+CGNSIPR=115200\r\n", "OK\r\n", rx_buffer);
+  check = send_at_command_and_check_response("AT+CGNSIPR=9600\r\n", "OK\r\n", rx_buffer);
   check = send_at_command_and_check_response("AT+CGNSSEQ=\"RMC\"\r\n", "OK\r\n", rx_buffer);
   while (1)
   {
@@ -193,7 +193,7 @@ int main(void)
 	  }
 	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "ERROR", rx_buffer);
 	  check = send_at_command_and_check_response("AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\n", "AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\r\nOK\r\n", rx_buffer);
-	  check = send_at_command_and_check_response("AT+CIPSEND=70\r\n", "AT+CIPSEND=70\r\r\n>", rx_buffer);
+	  check = send_at_command_and_check_response("AT+CIPSEND=98\r\n", "AT+CIPSEND=98\r\r\n>", rx_buffer);
 	  check = send_at_command_and_check_response(gp_buffer, "test\r\r\nSEND", rx_buffer);
 	  HAL_Delay(2000);
 
