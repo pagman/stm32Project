@@ -95,7 +95,7 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
 
 void replace_zeros_with_A(char *buffer, size_t size) {
     for (size_t i = 0; i < size; i++) {
-        if (buffer[i] == 0) {
+        if (buffer[i] == 'Q') {
             buffer[i] = 'A';
         }
     }
@@ -160,10 +160,10 @@ int main(void)
   while (1)
   {
 //	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n", rx_buffer);
-	  memset(gp_buffer, 0, sizeof(gp_buffer));
+	  memset(gp_buffer, "Q", sizeof(gp_buffer));
 	  check = send_at_command_and_check_response("AT+CGNSINF\r\n", "QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ", rx_buffer);
 	  strcpy(gp_buffer, rx_buffer);
-	  replace_zeros_with_A(gp_buffer, sizeof(gp_buffer));
+//	  replace_zeros_with_A(gp_buffer, sizeof(gp_buffer));
     /* USER CODE END WHILE */
 
 
