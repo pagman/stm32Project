@@ -75,7 +75,7 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
   memset(rx_data, 0, sizeof(rx_data));
   memset(received_data, 0, sizeof(received_data));
   // Start receiving response with timeout
-  HAL_UART_Receive(&huart1, rx_data, strlen(expected_response)+30,2000);
+  HAL_UART_Receive(&huart1, rx_data, strlen(expected_response)+30,1000);
 
   // Copy received data to output buffer
    strncpy(received_data, (char*)rx_data, 100); // Ensure null-termination
@@ -146,8 +146,8 @@ int main(void)
   uint8_t Rx_data[10];
   int check;
   sprintf(buffer,"Hello %d\r\n",count);//  creating a buffer of 10 bytes
-  char rx_buffer[100];
-  char gp_buffer[100];
+  char rx_buffer[104];
+  char gp_buffer[104];
   HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
   HAL_Delay(2000);
   HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
@@ -161,7 +161,7 @@ int main(void)
   {
 //	  check = send_at_command_and_check_response("AT\r\n", "AT\r\r\nOK\r\n", rx_buffer);
 	  memset(gp_buffer, 0, sizeof(gp_buffer));
-	  check = send_at_command_and_check_response("AT+CGNSINF\r\n", "OK\r\n", rx_buffer);
+	  check = send_at_command_and_check_response("AT+CGNSINF\r\n", "QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ", rx_buffer);
 	  strcpy(gp_buffer, rx_buffer);
 	  replace_zeros_with_A(gp_buffer, sizeof(gp_buffer));
     /* USER CODE END WHILE */
@@ -193,7 +193,7 @@ int main(void)
 	  }
 	  check = send_at_command_and_check_response("AT+CIFSR\r\n", "ERROR", rx_buffer);
 	  check = send_at_command_and_check_response("AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\n", "AT+CIPSTART=\"TCP\",\"45.154.87.237\",\"1887\"\r\r\nOK\r\n", rx_buffer);
-	  check = send_at_command_and_check_response("AT+CIPSEND=98\r\n", "AT+CIPSEND=98\r\r\n>", rx_buffer);
+	  check = send_at_command_and_check_response("AT+CIPSEND=100\r\n", "AT+CIPSEND=100\r\r\n>", rx_buffer);
 	  check = send_at_command_and_check_response(gp_buffer, "test\r\r\nSEND", rx_buffer);
 	  HAL_Delay(2000);
 
