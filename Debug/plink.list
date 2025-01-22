@@ -375,7 +375,7 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
  8000322:	f002 fcdf 	bl	8002ce4 <strcpy>
 
   // Send AT command
-  status = HAL_UART_Transmit(&huart1, tx_data, strlen((char*)tx_data),1000);
+  status = HAL_UART_Transmit(&huart1, tx_data, strlen((char*)tx_data),500);
  8000326:	6dbe      	ldr	r6, [r7, #88]	; 0x58
  8000328:	6dbb      	ldr	r3, [r7, #88]	; 0x58
  800032a:	0018      	movs	r0, r3
@@ -387,7 +387,7 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
  8000338:	1879      	adds	r1, r7, r1
  800033a:	18cd      	adds	r5, r1, r3
  800033c:	23fa      	movs	r3, #250	; 0xfa
- 800033e:	009b      	lsls	r3, r3, #2
+ 800033e:	005b      	lsls	r3, r3, #1
  8000340:	482d      	ldr	r0, [pc, #180]	; (80003f8 <send_at_command_and_check_response+0x1b4>)
  8000342:	0031      	movs	r1, r6
  8000344:	f001 fc90 	bl	8001c68 <HAL_UART_Transmit>
@@ -422,7 +422,7 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
  8000374:	0018      	movs	r0, r3
  8000376:	f002 fc8d 	bl	8002c94 <memset>
   // Start receiving response with timeout
-  HAL_UART_Receive(&huart1, rx_data, strlen(expected_response)+30,1000);
+  HAL_UART_Receive(&huart1, rx_data, strlen(expected_response)+30,500);
  800037a:	6d3c      	ldr	r4, [r7, #80]	; 0x50
  800037c:	6c3b      	ldr	r3, [r7, #64]	; 0x40
  800037e:	0018      	movs	r0, r3
@@ -432,7 +432,7 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
  8000388:	331e      	adds	r3, #30
  800038a:	b29a      	uxth	r2, r3
  800038c:	23fa      	movs	r3, #250	; 0xfa
- 800038e:	009b      	lsls	r3, r3, #2
+ 800038e:	005b      	lsls	r3, r3, #1
  8000390:	4819      	ldr	r0, [pc, #100]	; (80003f8 <send_at_command_and_check_response+0x1b4>)
  8000392:	0021      	movs	r1, r4
  8000394:	f001 fd08 	bl	8001da8 <HAL_UART_Receive>

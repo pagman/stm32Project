@@ -66,7 +66,7 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
   strcpy((char*)tx_data, at_command);
 
   // Send AT command
-  status = HAL_UART_Transmit(&huart1, tx_data, strlen((char*)tx_data),1000);
+  status = HAL_UART_Transmit(&huart1, tx_data, strlen((char*)tx_data),500);
   if (status != HAL_OK) {
     return -1; // Error during transmission
   }
@@ -75,7 +75,7 @@ int send_at_command_and_check_response(const char* at_command, const char* expec
   memset(rx_data, 0, sizeof(rx_data));
   memset(received_data, 0, sizeof(received_data));
   // Start receiving response with timeout
-  HAL_UART_Receive(&huart1, rx_data, strlen(expected_response)+30,1000);
+  HAL_UART_Receive(&huart1, rx_data, strlen(expected_response)+30,500);
 
   // Copy received data to output buffer
    strncpy(received_data, (char*)rx_data, 100); // Ensure null-termination
